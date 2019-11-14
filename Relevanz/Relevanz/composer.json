@@ -1,0 +1,10 @@
+{
+  "name": "releva/relevanz",
+  "description": "releva.nz - Technology for personalized marketing",
+  "autoload": {
+    "psr-4": {
+      "RelevanzTracking\\": "src/"
+    }
+  },
+  "type": "gambio-gx3-module"
+}

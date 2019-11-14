@@ -1,0 +1,75 @@
+.relevanz-configuration-form fieldset {
+    padding: 0 15px;
+}
+
+.relevanz-configuration-form h3 {
+    color: #737373;
+    height: 48px;
+    padding-left: 15px;
+    border-bottom: 3px solid #2196F3;
+    font-size: 12px;
+    margin: 0;
+    line-height: 32px;
+    font-family: Roboto, "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-weight: bold;
+}
+
+.relevanz-configuration-form fieldset .form-group {
+    margin-bottom: 0;
+    padding-top: 12px;
+    padding-bottom: 12px;
+}
+
+.relevanz-configuration-form fieldset .form-group label,
+.relevanz-configuration-form fieldset .form-group div.form-text {
+    padding-top: 6px;
+    font-weight: normal;
+}
+
+.relevanz-configuration-form fieldset .form-group:nth-child(odd) {
+    background-color: #F9F9F9;
+}
+
+.relevanz-configuration-form fieldset .form-group:nth-child(even) {
+    background-color: #FFFFFF;
+}
+
+.relevanz-configuration-form fieldset .form-group .error .form-control {
+    border-color: #E66554;
+}
+
+.relevanz-configuration-form fieldset .form-group .error .form-control:focus {
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(230, 101, 84, 0.6);
+    outline: none;
+}
+
+.relevanz-configuration-form fieldset .form-group .error .error-message {
+    color: #E66554;
+    display: block;
+    padding-top: 12px;
+    white-space: nowrap;
+}
+
+.relevanz-configuration-form fieldset .button-container {
+    margin: 24px -15px 0 0;
+}
+
+.relevanz-configuration-form fieldset .button-container {
+    margin: 24px -15px 0 0;
+}
+
+.relevanz-configuration-form .form-group .tooltip-icon {
+	visibility: hidden;
+}
+.relevanz-configuration-form .form-group:hover .tooltip-icon {
+	visibility: visible;
+}
+.relevanz-configuration-form .tooltip-icon.info i:first-child {
+    color: #737373;
+}
+.relevanz-configuration-form .form-control[disabled],
+.relevanz-configuration-form .form-control[readonly],
+.relevanz-configuration-form fieldset[disabled] .form-control {
+    border-color: rgba(0, 0, 0, 0.07);
+    color: rgba(0, 0, 0, 0.35);
+}

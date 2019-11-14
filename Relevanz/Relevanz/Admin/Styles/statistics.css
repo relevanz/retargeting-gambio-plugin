@@ -1,0 +1,25 @@
+#main-content {
+    margin-bottom: -4px;
+    padding-bottom: 0;
+}
+
+#main-content .message-stack:empty {
+    padding: 12px;
+}
+
+#main-content #content-block-wrapper {
+    padding: 0;
+    height: 100%;
+    height: calc(100% - 45px);
+}
+
+#relevanz-stats {
+	height: 100%;
+    width: 100%;
+    border: 0px;
+}
+#relevanz-stats.loading {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100px' height='100px' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' fill='none' stroke-linecap='round' r='33' stroke-width='2' stroke='%23000000' stroke-dasharray='33 33' transform='rotate(360 0 0)'%3E%3CanimateTransform attributeName='transform' type='rotate' calcMode='linear' values='0 50 50;360 50 50' keyTimes='0;1' dur='2s' begin='0s' repeatCount='indefinite'%3E%3C/animateTransform%3E%3C/circle%3E%3Ccircle cx='50' cy='50' fill='none' stroke-linecap='round' r='30' stroke-width='2' stroke='%23E30613' stroke-dasharray='30 30' stroke-dashoffset='30' transform='rotate(-360 0 0)'%3E%3CanimateTransform attributeName='transform' type='rotate' calcMode='linear' values='0 50 50;-360 50 50' keyTimes='0;1' dur='2s' begin='0s' repeatCount='indefinite'%3E%3C/animateTransform%3E%3C/circle%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: 50% 50%;
+}
