@@ -8,7 +8,7 @@ Released under the MIT License (Expat)
 namespace RelevanzTracking\Lib\Export;
 
 use RelevanzTracking\Lib\Export\Item\ExportItemInterface;
-use RelevanzTracking\Lib\Export\Helper\CSVWriter;
+use RelevanzTracking\Lib\Export\Helper\CsvWriter;
 
 /**
  * CSV Export Generator
@@ -20,12 +20,12 @@ abstract class AbstractCsvExporter implements ExporterInterface {
     protected $csv = null;
 
     public function __construct() {
-        $this->csv = new CSVWriter(null, [
+        $this->csv = new CsvWriter(null, [
             'delimiter' => ';',
             'quotechar' => '"',
             'escapechar' => '"',
             'lineterminator' => "\n",
-            'quoting' => CSVWriter::QUOTE_ALL,
+            'quoting' => CsvWriter::QUOTE_ALL,
             'charset' => [
                 'out' => 'UTF-8',
             ],

@@ -15,7 +15,7 @@ namespace RelevanzTracking\Lib\Export\Helper;
  * flexibility. You can specify just about everything about how it writes csv
  * files.
  */
-class CSVWriter {
+class CsvWriter {
 
     /**
      * Instructs CSVWriter to quote only columns with special characters such as the
