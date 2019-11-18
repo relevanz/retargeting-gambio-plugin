@@ -1,19 +1,21 @@
 <?php
 /* -----------------------------------------------------------
 Copyright (c) 2019 Releva GmbH - https://www.releva.nz
-Released under the GNU General Public License (Version 2)
-[http://www.gnu.org/licenses/gpl-2.0.html]
+Released under the MIT License (Expat)
+[https://opensource.org/licenses/MIT]
 --------------------------------------------------------------
 */
-namespace RelevanzTracking\Lib;
+namespace RelevanzTracking\Lib\Export;
+
+use RelevanzTracking\Lib\Export\Item\ExportItemInterface;
 
 /**
- * Export Generator
+ * Exporter Interface
  * 
  * Provides an interface for exporting the products data.
  */
-interface ExportGenerator {
-    public function addRow(array $row);
+interface ExporterInterface {
+    public function addItem(ExportItemInterface $item);
     public function getContents();
     public function getHttpHeaders();
 }

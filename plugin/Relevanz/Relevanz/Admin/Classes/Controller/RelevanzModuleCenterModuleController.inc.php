@@ -1,16 +1,17 @@
 <?php
 /* -----------------------------------------------------------
 Copyright (c) 2019 Releva GmbH - https://www.releva.nz
-Released under the GNU General Public License (Version 2)
-[http://www.gnu.org/licenses/gpl-2.0.html]
+Released under the MIT License (Expat)
+[https://opensource.org/licenses/MIT]
 --------------------------------------------------------------
 */
 require_once(__DIR__.'/../../../autoload.php');
 
 use RelevanzTracking\Lib\RelevanzApi;
 use RelevanzTracking\Lib\Credentials;
-use RelevanzTracking\Lib\RelevanzException;
-use RelevanzTracking\GambioConfiguration;
+use RelevanzTracking\Lib\Exception\RelevanzException;
+use RelevanzTracking\Shop\GambioConfiguration;
+use RelevanzTracking\Shop\GambioShopInfo;
 
 /**
  * Class RelevanzModuleCenterModuleController
@@ -21,17 +22,28 @@ use RelevanzTracking\GambioConfiguration;
  */
 class RelevanzModuleCenterModuleController extends AbstractModuleCenterModuleController {
     const ROUTE_ADMIN = 'admin.php?do=RelevanzModuleCenterModule/';
-    const STATS_FRAME = 'https://customer.releva.nz/?apikey=';
-
-    const ROUTE_EXPORT = 'shop.php?do=RelevanzExport&auth=:auth';
 
     protected $subTitle = '';
     protected $credentials = [];
+    
+    protected $pluginDir = '';
 
     protected function _init() {
         $this->pageTitle = $this->languageTextManager->get_text('relevanz_title');
 
         $this->credentials = GambioConfiguration::getCredentials();
+        
+        $dir = str_replace('\\', '/', __DIR__);
+        $reldir = str_replace(['\\', DIR_FS_CATALOG], ['/', ''], $dir);
+        if ($dir != $reldir) {
+            $dblocks = explode('/', $reldir);
+            if (count($dblocks) > 3) {
+                $this->pluginDir = implode('/', array_slice($dblocks, 0, -3)).'/';
+            }
+        }
+        if (empty($this->pluginDir)) {
+        	$this->pluginDir = 'GXModules/Relevanz/Relevanz/';
+        }
     }
 
     private function outputPage($view, $tmplData = []) {
@@ -44,15 +56,17 @@ class RelevanzModuleCenterModuleController extends AbstractModuleCenterModuleCon
         ], $tmplData));
 
         $assets = MainFactory::create('AssetCollection', [
-            MainFactory::create('Asset', DIR_WS_CATALOG.'GXModules/Relevanz/Relevanz/Admin/Styles/relevanz-font.css'),
-            MainFactory::create('Asset', DIR_WS_CATALOG.'GXModules/Relevanz/Relevanz/Admin/Styles/'.$view.'.css'),
+            MainFactory::create('Asset', DIR_WS_CATALOG.$this->pluginDir.'Admin/Styles/relevanz-font.css'),
+            MainFactory::create('Asset', DIR_WS_CATALOG.$this->pluginDir.'Admin/Styles/'.$view.'.css'),
             MainFactory::create('Asset', 'module_center_module.relevanz.lang.inc.php'),
             MainFactory::create('Asset', 'relevanz.lang.inc.php'),
         ]);
         return MainFactory::create(
             'AdminLayoutHttpControllerResponse',
             $title,
-            $this->getTemplateFile('Relevanz/Admin/Html/'.$view.'.php'),
+            new ExistingFile(new NonEmptyStringType(
+                DIR_FS_CATALOG.$this->pluginDir.'Admin/Html/'.$view.'.php'
+            )),
             $data,
             $assets
         );
@@ -99,7 +113,7 @@ class RelevanzModuleCenterModuleController extends AbstractModuleCenterModuleCon
         if (isset($_POST['conf']['apikey'])) {
             try {
                 $credentials = RelevanzApi::verifyApiKey($_POST['conf']['apikey'], [
-                    'callback-url' => GambioConfiguration::getUrlCallback()
+                    'callback-url' => GambioShopInfo::getUrlCallback()
                 ]);
                 GambioConfiguration::updateCredentials($credentials);
 
@@ -123,7 +137,7 @@ class RelevanzModuleCenterModuleController extends AbstractModuleCenterModuleCon
             }
         }
 
-        $exportUrl = str_replace(':auth', $this->credentials->getAuthHash(), GambioConfiguration::getUrlExport());
+        $exportUrl = str_replace(':auth', $this->credentials->getAuthHash(), GambioShopInfo::getUrlProductExport());
 
         return $this->outputPage('configuration', [
             'action' => self::ROUTE_ADMIN.'Conf',

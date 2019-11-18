@@ -1,8 +1,8 @@
 <?php
 /* -----------------------------------------------------------
 Copyright (c) 2019 Releva GmbH - https://www.releva.nz
-Released under the GNU General Public License (Version 2)
-[http://www.gnu.org/licenses/gpl-2.0.html]
+Released under the MIT License (Expat)
+[https://opensource.org/licenses/MIT]
 --------------------------------------------------------------
 */
 
@@ -18,7 +18,7 @@ class RelevanzAdminHeaderExtender extends RelevanzAdminHeaderExtender_parent
     public function proceed() {
         parent::proceed();
         if (!is_array($this->v_output_buffer)) {
-            $this->v_output_buffer = array();
+            $this->v_output_buffer = [];
         }
 
         if (!(bool)gm_get_conf('MODULE_CENTER_RELEVANZ_INSTALLED')) {

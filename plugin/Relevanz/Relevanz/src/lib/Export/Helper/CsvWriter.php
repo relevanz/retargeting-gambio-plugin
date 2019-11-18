@@ -1,11 +1,11 @@
 <?php
 /* -----------------------------------------------------------
 Copyright (c) 2019 Releva GmbH - https://www.releva.nz
-Released under the GNU General Public License (Version 2)
-[http://www.gnu.org/licenses/gpl-2.0.html]
+Released under the MIT License (Expat)
+[https://opensource.org/licenses/MIT]
 --------------------------------------------------------------
 */
-namespace RelevanzTracking\Lib;
+namespace RelevanzTracking\Lib\Export\Helper;
 
 /**
  * CSV Writer
@@ -56,17 +56,17 @@ class CSVWriter {
      * @var array
      * @access protected
      */
-    protected $dialect = array(
+    protected $dialect = [
         'delimiter' => ';',
         'quotechar' => '"',
         'escapechar' => '\\',
         'lineterminator' => "\n",
         'quoting' => self::QUOTE_MINIMAL,
-        'charset' => array (
+        'charset' => [
             'out' => null,
             'in' => null,
-        ),
-    );
+        ],
+    ];
 
     /**
      * Holds the file resource
@@ -80,7 +80,7 @@ class CSVWriter {
      * @var array
      * @access protected
      */
-    protected $data = array();
+    protected $data = [];
 
     /**
      * Class constructor
@@ -88,7 +88,7 @@ class CSVWriter {
      * @param resource|string Either a valid filename or a valid file resource
      * @param array A csv dialect array
      */
-    public function __construct($file, $dialect = array()) {
+    public function __construct($file, $dialect = []) {
         $this->setDialect($dialect);
 
         if (is_resource($file)) {
@@ -102,8 +102,10 @@ class CSVWriter {
                 } else {
                     $this->handle = fopen('php://memory', 'rwb');
                 }
-            } catch (PHPException $e) {
-                throw new RuntimeException('Unable to create/access file: '.$this->filename, 1449173661);
+            } catch (\Exception $e) {}
+
+            if ($this->handle === false) {
+                throw new \RuntimeException('Unable to create/access file: '.$this->filename, 1449173661);
             }
         }
     }

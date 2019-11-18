@@ -1,11 +1,16 @@
 <?php
 /* -----------------------------------------------------------
 Copyright (c) 2019 Releva GmbH - https://www.releva.nz
-Released under the GNU General Public License (Version 2)
-[http://www.gnu.org/licenses/gpl-2.0.html]
+Released under the MIT License (Expat)
+[https://opensource.org/licenses/MIT]
 --------------------------------------------------------------
 */
 namespace RelevanzTracking\Lib;
+
+use RelevanzTracking\Lib\RelevanzException;
+use RelevanzTracking\Lib\RelevanzExceptionMessage;
+
+use RelevanzTracking\Lib\Credentials;
 
 class RelevanzApi
 {

@@ -1,24 +1,26 @@
 <?php
 /* -----------------------------------------------------------
 Copyright (c) 2019 Releva GmbH - https://www.releva.nz
-Released under the GNU General Public License (Version 2)
-[http://www.gnu.org/licenses/gpl-2.0.html]
+Released under the MIT License (Expat)
+[https://opensource.org/licenses/MIT]
 --------------------------------------------------------------
 */
-namespace RelevanzTracking\Lib;
+namespace RelevanzTracking\Lib\Export;
+
+use RelevanzTracking\Lib\Export\Item\ExportItemInterface;
 
 /**
  * JSON Export Generator
  *
- * Provides an interface for exporting the products data in the JSON format.
+ * Provides an interface for exporting data in the JSON format.
  */
-class JsonExporter implements ExportGenerator {
+abstract class AbstractJsonExporter implements ExporterInterface {
     protected $data = [];
 
     public function __construct() {}
 
-    public function addRow(array $row) {
-        $this->data[] = $row;
+    public function addItem(ExportItemInterface $item) {
+        $this->data[] = $item->getData();
         return $this;
     }
 
@@ -28,7 +30,7 @@ class JsonExporter implements ExportGenerator {
 
     public function getHttpHeaders() {
         return [
-            'Content-Type: application/json; charset="utf-8"',
+            'Content-Type' => 'application/json; charset="utf-8"',
         ];
     }
 

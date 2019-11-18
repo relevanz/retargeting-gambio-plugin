@@ -1,13 +1,13 @@
 <?php
 /* -----------------------------------------------------------
 Copyright (c) 2019 Releva GmbH - https://www.releva.nz
-Released under the GNU General Public License (Version 2)
-[http://www.gnu.org/licenses/gpl-2.0.html]
+Released under the MIT License (Expat)
+[https://opensource.org/licenses/MIT]
 --------------------------------------------------------------
 */
 require_once(__DIR__.'/../../autoload.php');
 
-use RelevanzTracking\GambioConfiguration;
+use RelevanzTracking\Shop\GambioConfiguration;
 
 /**
  * Class RelevanzModuleCenterModule

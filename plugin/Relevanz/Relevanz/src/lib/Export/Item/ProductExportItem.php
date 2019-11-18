@@ -1,0 +1,81 @@
+<?php
+/* -----------------------------------------------------------
+Copyright (c) 2019 Releva GmbH - https://www.releva.nz
+Released under the MIT License (Expat)
+[https://opensource.org/licenses/MIT]
+--------------------------------------------------------------
+*/
+namespace RelevanzTracking\Lib\Export\Item;
+
+/**
+ * Product export item
+ *
+ * Simple data wrapper object that represents a product.
+ */
+class ProductExportItem implements ExportItemInterface {
+
+    protected $id = 0;
+    protected $categoryIds = [];
+    protected $name = '';
+    protected $descriptionShort = '';
+    protected $descriptionLong = '';
+    protected $price = 0.0;
+    protected $link = '';
+    protected $image = '';
+
+    public function __construct($id, array $cIds, $name, $descShort, $descLong, $price, $link, $image) {
+        $this->id = $id;
+        $this->categoryIds = $cIds;
+        $this->name = $name;
+        $this->descriptionShort = $descShort;
+        $this->descriptionLong = $descLong;
+        $this->price = (float)$price;
+        $this->link = $link;
+        $this->image = $image;
+    }
+
+    public function getId() {
+        return $this->id;
+    }
+
+    public function getCategoryIds() {
+        return $this->categoryIds;
+    }
+
+    public function getName() {
+        return $this->name;
+    }
+
+    public function getDescriptionShort() {
+        return $this->descriptionShort;
+    }
+
+    public function getDescriptionLong() {
+        return $this->descriptionLong;
+    }
+
+    public function getPrice() {
+        return $this->price;
+    }
+
+    public function getLink() {
+        return $this->link;
+    }
+
+    public function getImage() {
+        return $this->image;
+    }
+
+    public function getData() {
+        return [
+            'id' => $this->id,
+            'categoryIds' => $this->categoryIds,
+            'name' => $this->name,
+            'descriptionShort' => $this->descriptionShort,
+            'descriptionLong' => $this->descriptionLong,
+            'price' => $this->price,
+            'link' => $this->link,
+            'image' => $this->image,
+        ];
+    }
+}

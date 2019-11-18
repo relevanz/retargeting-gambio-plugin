@@ -1,16 +1,18 @@
 <?php
 /* -----------------------------------------------------------
 Copyright (c) 2019 Releva GmbH - https://www.releva.nz
-Released under the GNU General Public License (Version 2)
-[http://www.gnu.org/licenses/gpl-2.0.html]
+Released under the MIT License (Expat)
+[https://opensource.org/licenses/MIT]
 --------------------------------------------------------------
 */
 require_once(__DIR__.'/../../../autoload.php');
 
-use RelevanzTracking\Lib\RelevanzException;
-use RelevanzTracking\Lib\CSVExporter;
-use RelevanzTracking\Lib\JsonExporter;
-use RelevanzTracking\GambioConfiguration;
+use RelevanzTracking\Lib\Exception\RelevanzException;
+use RelevanzTracking\Lib\Export\Item\ProductExportItem;
+use RelevanzTracking\Lib\Export\ProductCsvExporter;
+use RelevanzTracking\Lib\Export\ProductJsonExporter;
+use RelevanzTracking\Shop\GambioConfiguration;
+use RelevanzTracking\Shop\GambioShopInfo;
 
 /**
  * Class RelevanzExportController
@@ -92,6 +94,7 @@ class RelevanzExportController extends AbstractRelevanzHttpViewController
     }
 
     public function actionDefault() {
+
         $pCount = $this->getProductCount();
         if (empty($pCount)) {
             return new HttpControllerResponse('No products found.', [
@@ -105,13 +108,13 @@ class RelevanzExportController extends AbstractRelevanzHttpViewController
         }
 
         $exporter = null;
-        switch ($this->_getQueryParameter('type')) {
+        switch ($this->_getQueryParameter('format')) {
             case 'json': {
-                $exporter = new JsonExporter();
+                $exporter = new ProductJsonExporter();
                 break;
             }
             default: {
-                $exporter = new CSVExporter();
+                $exporter = new ProductCsvExporter();
                 break;
             }
         }
@@ -131,36 +134,34 @@ class RelevanzExportController extends AbstractRelevanzHttpViewController
         }
 
         foreach ($result as $product) {
-            $exporter->addRow([
-                'product_id' => (int)$product['id'],
-                'category_ids' => $this->getCategoryIdsByProductId($product['id']),
-                'product_name' => $product['name'],
-                'short_description' => $product['shortDescription'],
-                'long_description' => preg_replace('/\[TAB:([^\]]*)\]/', '<h1>${1}</h1>', $product['longDescription']),
-                'price' => round($product['price'] + $product['price'] / 100 * $product['taxRate'], 2),
-                'link' => HTTP_SERVER . DIR_WS_CATALOG . 'product_info.php?info=p' . xtc_get_prid($product['id']),
-                'image' => $this->productImageUrl($product['image'])
-            ]);
+            $exporter->addItem(new ProductExportItem(
+                (int)$product['id'],
+                $this->getCategoryIdsByProductId($product['id']),
+                $product['name'],
+                $product['shortDescription'],
+                preg_replace('/\[TAB:([^\]]*)\]/', '<h1>${1}</h1>', $product['longDescription']),
+                $product['price'] + $product['price'] / 100 * $product['taxRate'],
+                HTTP_SERVER . DIR_WS_CATALOG . 'product_info.php?info=p' . xtc_get_prid($product['id']),
+                $this->productImageUrl($product['image'])
+            ));
         }
 
-        return new HttpControllerResponse(
-            $exporter->getContents(),
-            array_merge(
-                $exporter->getHttpHeaders(),
-                [
-                    'Cache-Control: must-revalidate',
-                    'X-Relevanz-Product-Count: '.$pCount,
-                    'Content-Type: text/plain; charset="utf-8"', 'Content-Disposition: inline',
-                ]
-            )
-        );
+        $headers = [];
+        foreach ($exporter->getHttpHeaders() as $hkey => $hval) {
+            $headers[] = $hkey.': '.$hval;
+        }
+        $headers[] = 'Cache-Control: must-revalidate';
+        $headers[] = 'X-Relevanz-Product-Count: '.$pCount;
+        #$headers[] = 'Content-Type: text/plain; charset="utf-8"', 'Content-Disposition: inline';
+
+        return new HttpControllerResponse($exporter->getContents(), $headers);
     }
 
     public static function discover() {
         return [
-            'url' => GambioConfiguration::getUrlExport(),
+            'url' => GambioShopInfo::getUrlProductExport(),
             'parameters' => [
-                'type' => [
+                'format' => [
                     'values' => ['csv', 'json'],
                     'default' => 'csv',
                     'optional' => true,

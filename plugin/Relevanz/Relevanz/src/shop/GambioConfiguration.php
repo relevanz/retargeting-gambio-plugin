@@ -1,31 +1,22 @@
 <?php
 /* -----------------------------------------------------------
 Copyright (c) 2019 Releva GmbH - https://www.releva.nz
-Released under the GNU General Public License (Version 2)
-[http://www.gnu.org/licenses/gpl-2.0.html]
+Released under the MIT License (Expat)
+[https://opensource.org/licenses/MIT]
 --------------------------------------------------------------
 */
-namespace RelevanzTracking;
+namespace RelevanzTracking\Shop;
 
-use RelevanzTracking\Lib\Credentials;
 use StaticGXCoreLoader;
 
-class GambioConfiguration implements Lib\Configuration
+use RelevanzTracking\Lib\ConfigurationInterface;
+use RelevanzTracking\Lib\Credentials;
+
+class GambioConfiguration implements ConfigurationInterface
 {
     const PLUGIN_VERSION = '1.1.0';
     const CONF_APIKEY = 'RELEVANZ_APIKEY';
     const CONF_USERID = 'RELEVANZ_USERID';
-
-    const ROUTE_CALLBACK = 'shop.php?do=RelevanzCallback&auth=:auth';
-    const ROUTE_EXPORT   = 'shop.php?do=RelevanzExport&auth=:auth';
-
-    public static function getUrlCallback() {
-        return str_replace('//', '/', HTTP_SERVER . DIR_WS_CATALOG . '/' . self::ROUTE_CALLBACK);
-    }
-
-    public static function getUrlExport() {
-        return str_replace('//', '/', HTTP_SERVER . DIR_WS_CATALOG . '/' . self::ROUTE_EXPORT);
-    }
 
     public static function getCredentials() {
         $qb = StaticGXCoreLoader::getDatabaseQueryBuilder();

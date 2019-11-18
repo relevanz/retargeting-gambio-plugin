@@ -1,7 +1,8 @@
+{load_language_text section="relevanz"}
+{load_language_text section="admin_buttons" name="admin_buttons"}
+
 {extends file="get_usermod:layouts/main/layout.html"}
 {block name="content"}
-    {load_language_text section="relevanz"}
-
     <div class="configform-wrapper">
         {foreach $content.messages as $message}
         <div class="alert alert-{$message.type}">
@@ -54,7 +55,7 @@
         </form>
     </div>
     <script>
-        document.addEventListener("DOMContentLoaded", function(event) {
+        document.addEventListener('DOMContentLoaded', function(event) {
             $('input[type="text"][readonly]').click(function () {
                 var t = $(this)[0];
                 t.focus();
@@ -65,7 +66,6 @@
 {/block}
 
 {block name="bottom_save_bar"}
-    {load_language_text section="admin_buttons" name="admin_buttons"}
     <button class="btn btn-primary"
             onclick="document.getElementById('relevanz-configuration-form').submit()">{$admin_buttons.BUTTON_SAVE}
     </button>
