@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<!-- {load_language_text section="admin_menu" use_fallback=$smarty.const.SHOW_UNTRANSLATED_MENUITEMS} -->
+<admin_menu>
+    {if 'MODULE_CENTER_RELEVANZ_INSTALLED'|gm_get_conf == '1'}
+    <menugroup id="BOX_RELEVANZ" sort="250" background="artkatalog.png" class="fa rzicon-relevanz" title="releva.nz">
+        <menuitem sort="10" link="admin.php" link_param="do=RelevanzModuleCenterModule/Stats" title="{$txt.BOX_RELEVANZ_STATS|escape}" />
+        <menuitem sort="20" link="admin.php" link_param="do=RelevanzModuleCenterModule/Conf" title="{$txt.BOX_RELEVANZ_CONF|escape}" />
+    </menugroup>
+    {/if}
+</admin_menu>
