@@ -1,23 +1,47 @@
 <?php
 /* --------------------------------------------------------------
-   cache_helper.php 2019-11-21
+   Hilfswerkzeug um die Caches des Shops zu leeren.
+
+   Bei der Deinstallation einiger Plugins kann es notwenig sein, dass
+   direkt nach dem das Plugin aus GXModules gelöscht wurde der Cache
+   für die Modulinformationen geleert werden muss, da der Shop aufgrund
+   von fatalen Fehlern unbedienbar wird.
+   Idealerweise sollten Sie schon, bevor das Plugin gelöscht wird,
+   die Shop-Admin Seite der Cache-Verwaltung offen haben, um dierekt
+   im Anschluss den Cache für die Modulinformationen zu leeren.
+   Sollten Sie das versäumt haben, können Sie diese Datei in das
+   Wurzelverzeichnis Ihres Shops laden und unter der entsprechenden
+   URL (z. B. https://www.mein-shop.de/cache_helper.php)
+   die Caches leeren, auch wenn Sie sich aufgrund von fatalen Fehlern
+   nicht mehr in Ihren Shop einloggen können.
+
+   --------------------------------------------------------------
+
+   Helper tool to clear the caches of the shop.
+
+   When uninstalling some plugins, it may be necessary to clear the
+   cache for the module information immediately after the plugin has
+   been deleted from GXModules, as the shop becomes unusable due to
+   fatal errors.
+   Ideally, you should have the shop admin page of the cache manager
+   open before deleting the plugin, in order to empty the cache for
+   the module information immediately afterwards.
+   If you have failed to do so, you can upload this file into the
+   root directory of your shop and empty the caches under the
+   corresponding URL (e.g. https://www.mein-shop.de/cache_helper.php),
+   even if you can no longer log into your shop due to fatal errors.
+
+   --------------------------------------------------------------
 
    Released under the GNU General Public License
    [http://www.gnu.org/licenses/gpl-2.0.html]
-
-   IMPORTANT! THIS FILE IS DEPRECATED AND WILL BE REPLACED IN THE FUTURE.
-   MODIFY IT ONLY FOR FIXES. DO NOT APPEND IT WITH NEW FEATURES, USE THE
-   NEW GX-ENGINE LIBRARIES INSTEAD.
-   --------------------------------------------------------------
 
    based on:
    (c) 2000-2001 The Exchange Project
    (c) 2002-2003 osCommerce coding standards (a typical file) www.oscommerce.com
    (c) 2003      nextcommerce (start.php,1.5 2004/03/17); www.nextcommerce.org
-   (c) 2003 XT-Commerce - community made shopping http://www.xt-commerce.com ($Id: start.php 1235 2005-09-21 19:11:43Z mz $)
+   (c) 2003 XT-Commerce - community made shopping http://www.xt-commerce.com
    (c) 2018 Gambio GmbH - http://www.gambio.de
-
-   Released under the GNU General Public License
    --------------------------------------------------------------
 */
 
