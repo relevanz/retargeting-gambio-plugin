@@ -11,12 +11,8 @@ use Releva\Retargeting\Gambio\Configuration as GambioConfiguration;
 use Releva\Retargeting\Gambio\ShopInfo as GambioShopInfo;
 
 /**
- * Class RelevanzExportController
- *
- * This controller exports the shops products for the releva.nz service.
- *
- * @category System
- * @package  AdminHttpViewControllers
+ * This controller generates some status informations about the shop
+ * and the plugin which are used by the releva.nz service.
  */
 class RelevanzCallbackController extends AbstractRelevanzHttpViewController
 {

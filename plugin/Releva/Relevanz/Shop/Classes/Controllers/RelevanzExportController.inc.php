@@ -14,12 +14,7 @@ use Releva\Retargeting\Base\Export\ProductJsonExporter;
 use Releva\Retargeting\Gambio\ShopInfo as GambioShopInfo;
 
 /**
- * Class RelevanzExportController
- *
  * This controller exports the shops products for the releva.nz service.
- *
- * @category System
- * @package  AdminHttpViewControllers
  */
 class RelevanzExportController extends AbstractRelevanzHttpViewController
 {

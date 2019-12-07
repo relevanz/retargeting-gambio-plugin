@@ -32,15 +32,6 @@ class ShopInfo extends AbstractShopInfo
         return ltrim(gm_get_conf('INSTALLED_VERSION'), 'v');
     }
 
-    public static function getPhpVersion() {
-        return [
-            'version' => phpversion(),
-            'sapi-name' => php_sapi_name(),
-            'memory-limit' => ini_get('memory_limit'),
-            'max-execution-time' => ini_get('max_execution_time'),
-        ];
-    }
-
     /**
      * Basically the result of the following sql query:
      *    SELECT @@version AS `version`, @@version_comment AS `server`
