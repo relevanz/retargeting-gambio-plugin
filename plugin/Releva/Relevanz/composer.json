@@ -25,7 +25,7 @@
             "rm lib/autoload.php",
             "rm -r lib/composer",
             "mv lib/releva/retargeting-base/lib/* lib/releva/retargeting-base/",
-            "rm -r lib/releva/retargeting-base/lib",
+            "rm -r lib/releva/retargeting-base/{lib,composer.json,LICENSE,README.md}",
             "rm -r lib/releva/retargeting-base/.git* ||:"
         ]
     }

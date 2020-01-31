@@ -48,13 +48,15 @@ class RelevanzExportController extends AbstractRelevanzHttpViewController
                 pr.products_id as `id`, pd.products_name as `name`,
                 pd.products_short_description as `shortDescription`,
                 pd.products_description as `longDescription`,
-                pr.products_price as `price`, tr.tax_rate as taxRate,
+                pr.products_price as `price`, sp.specials_new_products_price as specials_price,
+                tr.tax_rate as taxRate,
                 pr.products_image as `image`
             ')
             ->from(TABLE_PRODUCTS.' AS pr')
             ->join(TABLE_PRODUCTS_DESCRIPTION.' AS pd', 'pr.products_id = pd.products_id', 'left')
             ->join(TABLE_TAX_RATES.' AS tr', 'pr.products_tax_class_id = tr.tax_class_id', 'left')
             ->join(TABLE_LANGUAGES.' AS ln', 'pd.language_id = ln.languages_id', 'left')
+            ->join(TABLE_SPECIALS.' AS sp', ' pr.products_id = sp.products_id AND sp.status = "1"', 'left')
             ->where('ln.code', $lang)
             ->where('pr.products_status', '1')
             ->group_by('pr.products_id')
@@ -128,13 +130,19 @@ class RelevanzExportController extends AbstractRelevanzHttpViewController
         }
 
         foreach ($result as $product) {
+            $price = round($product['price'] + $product['price'] / 100 * $product['taxRate'], 2);
+            $priceOffer = ($product['specials_price'] === null)
+                ? $price
+                : round($product['specials_price'] + $product['specials_price'] / 100 * $product['taxRate'], 2);
+
             $exporter->addItem(new ProductExportItem(
                 (int)$product['id'],
                 $this->getCategoryIdsByProductId($product['id']),
                 $product['name'],
                 $product['shortDescription'],
                 preg_replace('/\[TAB:([^\]]*)\]/', '<h1>${1}</h1>', $product['longDescription']),
-                $product['price'] + $product['price'] / 100 * $product['taxRate'],
+                $price,
+                $priceOffer,
                 HTTP_SERVER . DIR_WS_CATALOG . 'product_info.php?info=p' . xtc_get_prid($product['id']),
                 $this->productImageUrl($product['image'])
             ));
