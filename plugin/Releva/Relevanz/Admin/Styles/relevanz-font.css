@@ -18,10 +18,23 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale
 }
-.rzicon-relevanz:before{content:'\0041';}
-.rzicon-statistics:before{content:'\0042';}
-.rzicon-settings:before{content:'\0043';}
-.rzicon-configuration:before{content:'\0044';}
+
+.rzicon-relevanz:before,
+body .fa.rzicon-relevanz:before {
+    content:'\0041';
+}
+.rzicon-statistics:before,
+body .fa.rzicon-statistics:before {
+    content:'\0042';
+}
+.rzicon-settings:before,
+body .fa.rzicon-settings:before {
+    content:'\0043';
+}
+.rzicon-configuration:before,
+body .fa.rzicon-configuration:before {
+    content:'\0044';
+}
 
 #main-menu nav > ul > li .icon.rzicon-relevanz {
     top: 3px;
