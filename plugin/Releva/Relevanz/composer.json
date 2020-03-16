@@ -1,17 +1,17 @@
 {
-    "name": "releva/relevanz-gambio-plugin",
+    "name": "relevanz/retargeting-gambio-plugin",
     "description": "releva.nz - Technology for personalized marketing",
     "type": "gambio-gx3-module",
     "config": {
         "vendor-dir": "lib"
     },
     "require": {
-        "releva/retargeting-base": "dev-master"
+        "relevanz/retargeting-base-lib": "dev-master"
     },
     "repositories": [
         {
             "type": "git",
-            "url": "https://github.com/jenslukas/relevanz-core-plugin.git"
+            "url": "https://github.com/relevanz/retargeting-base-lib.git"
         }
     ],
     "autoload": {
@@ -24,9 +24,9 @@
             "rm composer.lock",
             "rm lib/autoload.php",
             "rm -r lib/composer",
-            "mv lib/releva/retargeting-base/lib/* lib/releva/retargeting-base/",
-            "rm -r lib/releva/retargeting-base/{lib,composer.json,LICENSE,README.md}",
-            "rm -r lib/releva/retargeting-base/.git* ||:"
+            "mv lib/relevanz/retargeting-base-lib/lib/* lib/relevanz/retargeting-base-lib/",
+            "rm -r lib/relevanz/retargeting-base-lib/{lib,composer.json,LICENSE,README.md}",
+            "rm -r lib/relevanz/retargeting-base-lib/.git* ||:"
         ]
     }
 }

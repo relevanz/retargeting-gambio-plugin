@@ -5,8 +5,8 @@ Released under the MIT License (Expat)
 [https://opensource.org/licenses/MIT]
 --------------------------------------------------------------
 */
-require_once(__DIR__.'/lib/releva/retargeting-base/ClassLoader.php');
+require_once(__DIR__.'/lib/relevanz/retargeting-base-lib/ClassLoader.php');
 Releva\Retargeting\Base\ClassLoader::init()->addPsr4Map([
-    'Releva\\Retargeting\\Base\\' => __DIR__.'/lib/releva/retargeting-base/',
+    'Releva\\Retargeting\\Base\\' => __DIR__.'/lib/relevanz/retargeting-base-lib/',
     'Releva\\Retargeting\\Gambio\\' => __DIR__.'/lib/gambio/',
 ]);

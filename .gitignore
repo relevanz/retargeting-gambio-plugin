@@ -14,4 +14,4 @@ nbdist/
 
 ### composer
 composer.lock
-plugin/Releva/Relevanz/lib/releva/
+plugin/Releva/Relevanz/lib/relevanz/
