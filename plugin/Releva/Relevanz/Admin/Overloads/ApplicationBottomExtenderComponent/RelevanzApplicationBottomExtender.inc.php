@@ -9,6 +9,7 @@ require_once(__DIR__.'/../../../autoload.php');
 
 use Releva\Retargeting\Base\RelevanzApi;
 use Releva\Retargeting\Gambio\Configuration as GambioConfiguration;
+use Releva\Retargeting\Gambio\CookieConsentHelper;
 
 /**
  * Class RelevanzApplicationBottomExtender
@@ -36,37 +37,38 @@ class RelevanzApplicationBottomExtender extends RelevanzApplicationBottomExtende
             return;
         }
 
-        $url_js = '';
-        $url_base = RelevanzApi::RELEVANZ_TRACKER_URL.'?cid=' . $userid.'&t=d&';
-        $current_page = strtolower($this->get_page());
-        switch ($current_page) {
-            // FRONT PAGE (index)
-            case 'index': {
-                $url_js = $url_base.'action=s';
-                break;
-            }
-            // CATEGORY PAGE
-            case 'cat': {
+        $urlJs = '';
+        $urlBase = RelevanzApi::RELEVANZ_TRACKER_URL.'?cid=' . $userid.'&t=d&';
+        $currentPage = strtolower($this->get_page());
+        switch ($currentPage) {
+            case 'cat': { // category
                 if (isset($this->v_data_array['cPath'])
                     && ($cPath = explode('_', $this->v_data_array['cPath']))
                     && (($id = (int)array_pop($cPath)) > 0)
                 ) {
-                    $url_js = $url_base.'action=c&id=' . $id;
+                    $urlJs = $urlBase.'action=c&id=' . $id;
                 }
                 break;
             }
-            // PRODUCT PAGE
             case 'productinfo': {
                 if (isset($this->v_data_array['products_id'])
                     && (($id = (int)$this->v_data_array['products_id']) > 0)
                 ) {
-                    $url_js = $url_base.'action=p&id=' . $id;
+                    $urlJs = $urlBase.'action=p&id=' . $id;
                 }
+                break;
+            }
+            case 'checkout': {
+                // Let's make RelevanzCheckoutSuccessExtender do it's magic.
+                break;
+            }
+            default: {
+                $urlJs = $urlBase.'action=s';
                 break;
             }
         }
 
-        if (empty($url_js)) {
+        if (empty($urlJs)) {
             return;
         }
 
@@ -74,10 +76,10 @@ class RelevanzApplicationBottomExtender extends RelevanzApplicationBottomExtende
             $this->v_output_buffer = [];
         }
 
-        $this->v_output_buffer[] = '
-            <!-- Start of releva.nz tracking code -->
-            <script type="text/javascript" src="' . htmlspecialchars($url_js) . '" async="true"></script>
-            <!-- End of releva.nz tracking code -->';
+        $this->v_output_buffer[] =
+             '<!-- Start of releva.nz tracking code -->'."\n"
+            .(new CookieConsentHelper())->getScriptTag($urlJs)."\n"
+            .'<!-- End of releva.nz tracking code -->';
     }
 
 }

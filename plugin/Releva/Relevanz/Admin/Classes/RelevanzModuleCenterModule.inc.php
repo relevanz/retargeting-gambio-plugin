@@ -8,6 +8,7 @@ Released under the MIT License (Expat)
 require_once(__DIR__.'/../../autoload.php');
 
 use Releva\Retargeting\Gambio\Configuration as GambioConfiguration;
+use Releva\Retargeting\Gambio\CookieConsentHelper;
 
 /**
  * Class RelevanzModuleCenterModule
@@ -53,6 +54,10 @@ class RelevanzModuleCenterModule extends AbstractModuleCenterModule
             ->where('customers_id', $_SESSION['customer_id'])
             ->limit(1)
             ->update(TABLE_ADMIN_ACCESS);
+
+        // Clear some caches.
+        MainFactory::create_object('CacheControl')->clear_data_cache();
+        MainFactory::create_object('PhraseCacheBuilder', [])->build();
     }
 
     /**
@@ -67,6 +72,12 @@ class RelevanzModuleCenterModule extends AbstractModuleCenterModule
         $columnsQuery = $this->db->query("DESCRIBE `admin_access` 'relevanz'");
         if ($columnsQuery->num_rows()) {
             $this->db->query('ALTER TABLE ' . TABLE_ADMIN_ACCESS . ' DROP `relevanz`');
+        }
+
+        if (class_exists('CookieConsentPanelControllerFactory')) {
+            (new CookieConsentPanelControllerFactory())
+                ->purposeDeleteService()
+                 ->deleteByPurposeAlias(CookieConsentHelper::PURPOSE_ALIAS);
         }
     }
 }

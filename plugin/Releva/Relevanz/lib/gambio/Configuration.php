@@ -16,7 +16,7 @@ use Releva\Retargeting\Base\Credentials;
 
 class Configuration implements ConfigurationInterface
 {
-    const PLUGIN_VERSION = '1.1.1';
+    const PLUGIN_VERSION = '1.2.0';
     const CONF_APIKEY = 'RELEVANZ_APIKEY';
     const CONF_USERID = 'RELEVANZ_USERID';
 

@@ -9,6 +9,7 @@ require_once(__DIR__.'/../../../autoload.php');
 
 use Releva\Retargeting\Base\RelevanzApi;
 use Releva\Retargeting\Gambio\Configuration as GambioConfiguration;
+use Releva\Retargeting\Gambio\CookieConsentHelper;
 
 /**
  * Class RelevanzCheckoutSuccessExtender
@@ -34,31 +35,39 @@ class RelevanzCheckoutSuccessExtender extends RelevanzCheckoutSuccessExtender_pa
             return;
         }
 
-        if (!isset($this->v_data_array['orders_id']) || empty($this->v_data_array['orders_id'])
-            || !isset($this->v_data_array['coo_order']) || !is_object($this->v_data_array['coo_order'])
+        $cch = new CookieConsentHelper();
+
+        $jsUrls = [];
+
+        if (isset($this->v_data_array['orders_id']) && !empty($this->v_data_array['orders_id'])
+            && isset($this->v_data_array['coo_order']) && is_object($this->v_data_array['coo_order'])
         ) {
-            return;
+            $orderId = $this->v_data_array['orders_id'];
+            $orderTotal = sprintf("%0.2f", round($this->v_data_array['coo_order']->info['pp_total'], 2));
+            $productIds = [];
+
+            foreach($this->v_data_array['coo_order']->products as $item) {
+                $productIds[] = $item['id'];
+            }
+
+            $jsUrls[] = $cch->getScriptTag(
+                RelevanzApi::RELEVANZ_CONV_URL.'?cid='.$userid.'&orderId='.$orderId
+                    .'&amount='.$orderTotal.'&products='.implode(',', $productIds)
+            );
         }
 
-        $orderId = $this->v_data_array['orders_id'];
-        $orderTotal = sprintf("%0.2f", round($this->v_data_array['coo_order']->info['pp_total'], 2));
-        $productIds = [];
-
-        foreach($this->v_data_array['coo_order']->products as $item) {
-            $productIds[] = $item['id'];
-        }
-
-        $url_js = RelevanzApi::RELEVANZ_CONV_URL.'?cid='.$userid.'&orderId='.$orderId
-            .'&amount='.$orderTotal.'&products='.implode(',', $productIds);
+        $jsUrls[] = $cch->getScriptTag(
+            RelevanzApi::RELEVANZ_TRACKER_URL.'?cid=' . $userid.'&t=d&action=t'
+        );
 
         if (!is_array($this->html_output_array)) {
-            $this->html_output_array = array();
+            $this->html_output_array = [];
         }
 
-        $this->html_output_array[] = '
-            <!-- Start of releva.nz tracking code -->
-            <script type="text/javascript" src="' . htmlspecialchars($url_js) . '" async="true"></script>
-            <!-- End of releva.nz tracking code -->';
+        $this->html_output_array[] =
+             '<!-- Start of releva.nz tracking code -->'."\n"
+            .implode("\n", $jsUrls)."\n"
+            .'<!-- End of releva.nz tracking code -->';
     }
 
 }

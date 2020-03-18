@@ -12,6 +12,7 @@ use Releva\Retargeting\Base\Credentials;
 use Releva\Retargeting\Base\Exception\RelevanzException;
 use Releva\Retargeting\Gambio\Configuration as GambioConfiguration;
 use Releva\Retargeting\Gambio\ShopInfo as GambioShopInfo;
+use Releva\Retargeting\Gambio\CookieConsentHelper;
 
 /**
  * Class RelevanzModuleCenterModuleController
@@ -100,6 +101,8 @@ class RelevanzModuleCenterModuleController extends AbstractModuleCenterModuleCon
     public function actionConf() {
         $this->subTitle = $this->languageTextManager->get_text('relevanz_subtitle_conf');
 
+        $cch = new CookieConsentHelper();
+
         $messages = [];
         if (isset($_POST['conf']['apikey'])) {
             try {
@@ -128,12 +131,20 @@ class RelevanzModuleCenterModuleController extends AbstractModuleCenterModuleCon
             }
         }
 
+        if (isset($_POST['conf']['ccc']) && ((int)$_POST['conf']['ccc'] > 0)) {
+            $cch->updateConfigCategoryId((int)$_POST['conf']['ccc']);
+        }
+
         $exportUrl = str_replace(':auth', $this->credentials->getAuthHash(), GambioShopInfo::getUrlProductExport());
+
+        $cch->makeItSo();
 
         return $this->outputPage('configuration', [
             'action' => self::ROUTE_ADMIN.'Conf',
             'messages' => $messages,
             'urlExport' => $exportUrl,
+            'ccCategories' => $cch->getCategories(),
+            'ccCurrentCategory' => $cch->getCurrentPurposeCategoryId(),
         ]);
     }
 

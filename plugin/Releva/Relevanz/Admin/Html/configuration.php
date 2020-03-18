@@ -14,6 +14,8 @@
         <form id="relevanz-configuration-form" class="form-horizontal relevanz-configuration-form"
               action="{$content.action}" method="post" enctype="multipart/form-data">
             <fieldset>
+                <legend>{$txt.legend_credentials}</legend>
+
                 {assign var='helpBox' value={$txt.label_apikey_tooltip}}
                 {assign var='helpBox' value={$helpBox|replace:['[br]','[plink]','[/plink]']:['<br>','<a style="text-decoration: underline;" href="https://releva.nz" target="_blank">','</a>']}}
 
@@ -30,7 +32,6 @@
                 </div>
 
                 {if $content.credentials->isComplete()}
-
                 <div class="form-group visibility_switcher">
                     <label class="col-md-3">{$txt.label_customerid}</label>
                     <div class="col-md-7">
@@ -52,6 +53,25 @@
                 </div>
                 {/if}
             </fieldset>
+
+            {if $content.ccCategories != null}
+            <fieldset>
+                <legend>{$txt.legend_cookieconsent}</legend>
+                <div class="form-group visibility_switcher">
+                    <label class="col-md-3">{$txt.label_cookieconsentcategory}</label>
+                    <div class="col-md-7">
+                        <select id="conf_ccc" name="conf[ccc]" class="form-control">
+                            {foreach $content.ccCategories as $ccid => $ccname}
+                                <option value="{$ccid}" {if $ccid == $content.ccCurrentCategory} selected{/if}>{$ccname}</option>
+                            {/foreach}
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <span class="tooltip-icon" data-gx-widget="tooltip_icon" data-tooltip_icon-type="info">{$txt.label_cookieconsentcategory_tooltip}</span>
+                    </div>
+                </div>
+            </fieldset>
+            {/if}
         </form>
     </div>
     <script>
