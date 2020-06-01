@@ -63,39 +63,15 @@ class CookieConsentHelper
             return $this->configCategoryId;
         }
 
-        $qb = StaticGXCoreLoader::getDatabaseQueryBuilder();
-
-        $row = $qb->select('*')->from(TABLE_CONFIGURATION)
-            ->where('configuration_key', self::CONFIG_KEY)->get()->row_array();
-
-        $this->configCategoryId = (isset($row['configuration_value']) && !empty($row['configuration_value']))
-            ? (int)$row['configuration_value']
-            : self::CATEGORY_DEFAULT;
+        $id = Configuration::read(self::CONFIG_KEY);
+        $this->configCategoryId = $id === null ? self::CATEGORY_DEFAULT : (int)$id;
 
         return $this->configCategoryId;
     }
 
     public function updateConfigCategoryId($categoryId) {
         $this->configCategoryId = $categoryId;
-
-        $qb = StaticGXCoreLoader::getDatabaseQueryBuilder();
-
-        $configRows = $qb->select('*')->from(TABLE_CONFIGURATION)
-            ->where('configuration_key', self::CONFIG_KEY)
-            ->get()->num_rows();
-
-        if ($configRows === 0) {
-            $now = new DateTime();
-            $qb->insert(TABLE_CONFIGURATION, [
-                'configuration_key'   => self::CONFIG_KEY,
-                'configuration_value' => $categoryId,
-                'sort_order' => 0,
-                'date_added' => $now->format('Y-m-d H:i:s'),
-            ]);
-        } else {
-            $qb->where('configuration_key', self::CONFIG_KEY)
-                ->update(TABLE_CONFIGURATION, ['configuration_value' => $categoryId]);
-        }
+        Configuration::write(self::CONFIG_KEY, $this->configCategoryId);
     }
 
     public function getRelevaPurpose() {
@@ -172,15 +148,28 @@ class CookieConsentHelper
         if ($p === null) {
             $p = $this->getRelevaPurpose();
         }
-        $dto = new PurposeUpdateDto(
-            $this->getConfigCategoryId(),
-            $p->description()->value(),
-            $p->name()->value(),
-            true, // status
-            (bool)$p->deletable()->value(),
-            self::PURPOSE_ALIAS,
-            (int)$p->id()->value()
-        );
+        try {
+            $dto = new PurposeUpdateDto(
+                $this->getConfigCategoryId(),
+                $p->description()->value(),
+                $p->name()->value(),
+                true, // status
+                self::PURPOSE_ALIAS,
+                (int)$p->id()->value()
+            );
+        } catch (\TypeError $te) {
+            // Gambio has changed the signature of the contructor for the GX4.1.1 update.
+            // Try the old version.
+            $dto = new PurposeUpdateDto(
+                $this->getConfigCategoryId(),
+                $p->description()->value(),
+                $p->name()->value(),
+                true, // status
+                (bool)$p->deletable()->value(),
+                self::PURPOSE_ALIAS,
+                (int)$p->id()->value()
+            );
+        }
         $this->gccf()->purposeUpdateService()->update($dto);
     }
 

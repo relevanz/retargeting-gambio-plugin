@@ -20,17 +20,6 @@ class RelevanzExportController extends AbstractRelevanzHttpViewController
 {
     const ITEMS_PER_PAGE = 2500;
 
-    protected function getMainLang() {
-        $langResult = $this->db
-            ->select('configuration_value')->from(TABLE_CONFIGURATION)
-            ->where('configuration_key', 'DEFAULT_LANGUAGE')
-            ->get()->row_array();
-        if (!is_array($langResult) || !isset($langResult['configuration_value'])) {
-            return null;
-        }
-        return $langResult['configuration_value'];
-    }
-
     protected function getProductCount() {
         $r = $this->db->select('count(*)', false)
             ->from(TABLE_PRODUCTS)
@@ -90,7 +79,6 @@ class RelevanzExportController extends AbstractRelevanzHttpViewController
     }
 
     public function actionDefault() {
-
         $pCount = $this->getProductCount();
         if (empty($pCount)) {
             return new HttpControllerResponse('No products found.', [
@@ -98,10 +86,7 @@ class RelevanzExportController extends AbstractRelevanzHttpViewController
             ]);
         }
 
-        $lang = $this->getMainLang();
-        if (empty($lang)) {
-            throw new RelevanzException('Unable to get default language.', 1554160909);
-        }
+        $lang = MainFactory::create('LanguageProvider', $this->db)->getDefaultLanguageCode();
 
         $exporter = null;
         switch ($this->_getQueryParameter('format')) {
@@ -114,7 +99,6 @@ class RelevanzExportController extends AbstractRelevanzHttpViewController
                 break;
             }
         }
-
         $pq = $this->getProductQuery($lang);
 
         if (($page = (int)$this->_getQueryParameter('page')) > 0) {
@@ -148,13 +132,14 @@ class RelevanzExportController extends AbstractRelevanzHttpViewController
             ));
         }
 
+
         $headers = [];
         foreach ($exporter->getHttpHeaders() as $hkey => $hval) {
             $headers[] = $hkey.': '.$hval;
         }
         $headers[] = 'Cache-Control: must-revalidate';
         $headers[] = 'X-Relevanz-Product-Count: '.$pCount;
-        #$headers[] = 'Content-Type: text/plain; charset="utf-8"', 'Content-Disposition: inline';
+        #$headers[] = 'Content-Type: text/plain; charset="utf-8"'; $headers[] = 'Content-Disposition: inline';
 
         return new HttpControllerResponse($exporter->getContents(), $headers);
     }
