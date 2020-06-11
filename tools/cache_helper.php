@@ -253,9 +253,15 @@ table tr:nth-child(odd) td {
             <tbody>
 <?php
 foreach ($gc->getCaches() as $cache => $label) {
+    $btnLabel = 'BUTTON_'.$label.'_CACHE';
+    $btnLabelTrans = $gc->trans($btnLabel, 'clear_cache');
+    if ($btnLabel === $btnLabelTrans) {
+        // this cache has been removed or replaced.
+        continue;
+    }
     echo '
                 <tr>
-                    <td><label>'.$gc->trans('BUTTON_'.$label.'_CACHE', 'clear_cache').'</label></td>
+                    <td><label>'.$btnLabelTrans.'</label></td>
                     <td><a class="btn" href="?cache='.$cache.'">'.$gc->trans('execute', 'buttons').'</a></td>
                     <td>'.$gc->trans('TEXT_'.$label.'_CACHE', 'clear_cache').'</td>
                 </tr>';
