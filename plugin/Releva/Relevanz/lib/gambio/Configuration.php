@@ -88,7 +88,7 @@ class Configuration implements ConfigurationInterface
     }
 
     public static function write($key, $value) {
-        return self::gi()->_read($key, $value);
+        return self::gi()->_write($key, $value);
     }
 
     public static function getCredentials() {
