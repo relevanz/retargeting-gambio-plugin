@@ -12,6 +12,3 @@ dist/
 nbdist/
 .nb-gradle/
 
-### composer
-composer.lock
-plugin/Releva/Relevanz/lib/relevanz/
