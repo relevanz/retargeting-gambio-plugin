@@ -31,8 +31,10 @@ class RelevanzModuleCenterModule extends AbstractModuleCenterModule
     public function install() {
         parent::install();
 
-        if ($this->db->query('SHOW TABLES LIKE "admin_access"')->num_rows() == 1) {
-            $columnsQuery = $this->db->query("DESCRIBE `admin_access` 'relevanz'");
+        if (defined('TABLE_ADMIN_ACCESS')
+            && ($this->db->query('SHOW TABLES LIKE "'.TABLE_ADMIN_ACCESS.'"')->num_rows() == 1)
+        ) {
+            $columnsQuery = $this->db->query('DESCRIBE `'.TABLE_ADMIN_ACCESS.'` "relevanz"');
 
             if (!$columnsQuery->num_rows()) {
                 $this->db->query("ALTER TABLE " . TABLE_ADMIN_ACCESS . " ADD `relevanz` INT(1) NOT NULL DEFAULT '0'");
@@ -80,7 +82,9 @@ class RelevanzModuleCenterModule extends AbstractModuleCenterModule
 
         GambioConfiguration::deleteAll();
 
-        if ($this->db->query('SHOW TABLES LIKE "admin_access"')->num_rows() == 1) {
+        if (defined('TABLE_ADMIN_ACCESS')
+            && ($this->db->query('SHOW TABLES LIKE "'.TABLE_ADMIN_ACCESS.'"')->num_rows() == 1)
+        ) {
             $columnsQuery = $this->db->query("DESCRIBE `admin_access` 'relevanz'");
             if ($columnsQuery->num_rows()) {
                 $this->db->query('ALTER TABLE ' . TABLE_ADMIN_ACCESS . ' DROP `relevanz`');
