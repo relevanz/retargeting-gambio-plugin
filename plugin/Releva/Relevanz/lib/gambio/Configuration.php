@@ -17,7 +17,7 @@ use Releva\Retargeting\Base\Credentials;
 
 class Configuration implements ConfigurationInterface
 {
-    const PLUGIN_VERSION = '1.2.2';
+    const PLUGIN_VERSION = '1.2.3';
     const CONF_PREFIX = 'configuration/';
     const CONF_APIKEY = 'RELEVANZ_APIKEY';
     const CONF_USERID = 'RELEVANZ_USERID';
@@ -76,6 +76,18 @@ class Configuration implements ConfigurationInterface
         }
     }
 
+    protected function _delete($key) {
+        if ($this->configurationService !== null) {
+            $this->configurationService->delete(self::CONF_PREFIX.$key);
+        } else {
+            $this->databaseQueryBuilder
+                ->delete(TABLE_CONFIGURATION)
+                ->where('configuration_key = :key')
+                ->setParameter('key', $key)
+                ->execute();
+        }
+    }
+
     protected static function gi() {
         if (self::$instance === null) {
             self::$instance = new self();
@@ -101,6 +113,11 @@ class Configuration implements ConfigurationInterface
     public static function updateCredentials(Credentials $credentials) {
         self::write(self::CONF_APIKEY, $credentials->getApiKey());
         self::write(self::CONF_USERID, $credentials->getUserId());
+    }
+
+    public static function deleteAll() {
+        self::gi()->_delete(self::CONF_APIKEY);
+        self::gi()->_delete(self::CONF_USERID);
     }
 
     public static function getPluginVersion() {
