@@ -65,6 +65,21 @@ class GambioCacheControl {
 
     protected function clearOutput() {
         $cc = $this->getCacheControl();
+        if (class_exists('ThemeDirectoryRoot') && class_exists('ThemeSettings') && class_exists('RequiredDirectory')
+            && (defined('CURRENT_THEME') && !empty(CURRENT_THEME)) || (defined('PREVIEW_MODE') && PREVIEW_MODE)
+        ) {
+            $themeId              = StaticGXCoreLoader::getThemeControl()->getCurrentTheme();
+            $themeSourcePath      = DIR_FS_CATALOG . StaticGXCoreLoader::getThemeControl()->getThemesPath();
+            $themeDestinationPath = DIR_FS_CATALOG . StaticGXCoreLoader::getThemeControl()->getThemePath();
+
+            $destination   = ThemeDirectoryRoot::create(new RequiredDirectory($themeDestinationPath));
+            $themeSettings = ThemeSettings::create(ThemeDirectoryRoot::create(new ExistingDirectory($themeSourcePath)),
+                                                   $destination);
+
+            /** @var ThemeService $themeService */
+            $themeService = StaticGXCoreLoader::getService('Theme');
+            $themeService->buildTemporaryTheme(ThemeId::create($themeId), $themeSettings);
+        }
         $cc->clear_content_view_cache();
         $cc->clear_templates_c();
         $cc->clear_template_cache();
@@ -75,12 +90,23 @@ class GambioCacheControl {
     }
 
     protected function clearData() {
+        if (method_exists($this->getCacheControl(), 'clear_menu_cache')) {
+            $this->getCacheControl()->clear_menu_cache();
+        }
         $this->getCacheControl()->clear_data_cache();
     }
 
     protected function clearText() {
         $this->clearData();
         MainFactory::create_object('PhraseCacheBuilder', [])->build();
+
+        /** @var CacheFactory $cacheFactory */
+        if (class_exists('LegacyDependencyContainer') && class_exists('CacheFactory')) {
+            LegacyDependencyContainer::getInstance()
+            ->get(CacheFactory::class)
+            ->createCacheFor('text_cache')
+            ->clear();
+        }
     }
 
     public function clearSubmenu() {
