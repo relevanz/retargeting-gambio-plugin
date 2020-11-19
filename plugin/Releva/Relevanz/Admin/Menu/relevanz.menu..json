@@ -1,0 +1,34 @@
+[
+    {
+        "id": "BOX_RELEVANZ",
+        "sort": 250,
+        "class": "fa fa-line-chart rzicon-relevanz",
+        "title": "releva.nz",
+        "items": [
+            {
+                "sort": 10,
+                "link": "admin.php",
+                "link_param": "do=RelevanzModuleCenterModule/Stats",
+                "title": "admin_menu.BOX_RELEVANZ_STATS",
+                "if": {
+                    "filter": "configActive",
+                    "args": [
+                        "MODULE_CENTER_RELEVANZ_INSTALLED"
+                    ]
+                }
+            },
+            {
+                "sort": 20,
+                "link": "admin.php",
+                "link_param": "do=RelevanzModuleCenterModule/Conf",
+                "title": "admin_menu.BOX_RELEVANZ_CONF",
+                "if": {
+                    "filter": "configActive",
+                    "args": [
+                        "MODULE_CENTER_RELEVANZ_INSTALLED"
+                    ]
+                }
+            }
+        ]
+    }
+]
