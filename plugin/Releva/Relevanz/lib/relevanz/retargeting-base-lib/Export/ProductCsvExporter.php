@@ -30,7 +30,7 @@ class ProductCsvExporter extends AbstractCsvExporter
     public function formatItemRow(ExportItemInterface $product) {
         if (!($product instanceof ProductExportItem)) {
             throw new InvalidArgumentException(
-                'Expected object of type '.ProductExportItem::class.', got '.get_class($product).'.',
+                'Expected object of type ProductExportItem, got '.get_class($product).'.',
                 1574007381
             );
         }
