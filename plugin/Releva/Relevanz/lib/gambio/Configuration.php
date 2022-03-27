@@ -53,7 +53,11 @@ class Configuration implements ConfigurationInterface
 
     protected function _write($key, $value) {
         if ($this->configurationService !== null) {
-            $this->configurationService->save(GmConfigurationWrite::create(self::CONF_PREFIX.$key, (string)$value));
+            if (class_exists(GmConfigurationWrite::class)) {
+                $this->configurationService->save(GmConfigurationWrite::create(self::CONF_PREFIX.$key, (string)$value));
+            } else {
+                $this->configurationService->save(self::CONF_PREFIX.$key, (string)$value);
+            }
 
         } else {
             $configRows = $this->databaseQueryBuilder
