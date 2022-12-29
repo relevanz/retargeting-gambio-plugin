@@ -279,10 +279,10 @@ class CsvWriter {
     protected function writeData($altQuote = null) {
         $rows = [];
         foreach ($this->data as $row) {
-            $rows[] = implode($this->formatRow($row, $altQuote), $this->dialect['delimiter']);
+            $rows[] = implode($this->dialect['delimiter'], $this->formatRow($row, $altQuote));
         }
         // ensures that there is a line terminator at the end of the file, which is necessary
-        $output = implode($rows, $this->dialect['lineterminator']) . $this->dialect['lineterminator'];
+        $output = implode($this->dialect['lineterminator'], $rows) . $this->dialect['lineterminator'];
         fwrite($this->handle, $output);
         $this->data = []; // data has been written, so empty it
     }

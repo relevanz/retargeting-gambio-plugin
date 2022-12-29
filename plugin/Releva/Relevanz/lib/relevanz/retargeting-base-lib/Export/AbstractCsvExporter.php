@@ -30,9 +30,6 @@ abstract class AbstractCsvExporter implements ExporterInterface
             'escapechar' => '"',
             'lineterminator' => "\n",
             'quoting' => CsvWriter::QUOTE_ALL,
-            'charset' => [
-                'out' => 'UTF-8',
-            ],
         ]);
     }
 

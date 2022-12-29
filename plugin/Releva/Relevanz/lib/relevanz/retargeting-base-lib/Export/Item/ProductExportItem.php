@@ -7,6 +7,8 @@ Released under the MIT License (Expat)
 */
 namespace Releva\Retargeting\Base\Export\Item;
 
+use Releva\Retargeting\Base\Utf8Util;
+
 /**
  * Product export item
  *
@@ -27,9 +29,9 @@ class ProductExportItem implements ExportItemInterface
     public function __construct($id, array $cIds, $name, $descShort, $descLong, $price, $priceOffer, $link, $image) {
         $this->id = $id;
         $this->categoryIds = $cIds;
-        $this->name = $name;
-        $this->descriptionShort = $descShort;
-        $this->descriptionLong = $descLong;
+        $this->name = Utf8Util::toUtf8($name);
+        $this->descriptionShort = str_replace(["\r\n", "\r"], "\n", Utf8Util::toUtf8($descShort));
+        $this->descriptionLong = str_replace(["\r\n", "\r"], "\n", Utf8Util::toUtf8($descLong));
         $this->price = (float)$price;
         $this->priceOffer = (float)$priceOffer;
         $this->price = max($this->price, $this->priceOffer);
