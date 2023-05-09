@@ -24,21 +24,28 @@ class RelevanzApplicationBottomExtender extends RelevanzApplicationBottomExtende
      * Overloaded "proceed" method.
      */
     public function proceed() {
-        parent::proceed();
+        if (!is_array($this->v_output_buffer)) {
+            $this->v_output_buffer = [];
+        }
 
-        if (!(bool)gm_get_conf('MODULE_CENTER_RELEVANZ_INSTALLED')) {
+        if (!(bool)gm_get_conf('MODULE_CENTER_RELEVANZ_INSTALLED')
+            || !defined(GambioConfiguration::CONF_USERID)
+        ) {
+            parent::proceed();
             return;
         }
-        if (!defined(GambioConfiguration::CONF_USERID)) {
-            return;
-        }
+
         $userid = constant(GambioConfiguration::CONF_USERID);
         if (empty($userid)) {
+            parent::proceed();
             return;
         }
 
         $urlJs = '';
         $urlBase = RelevanzApi::RELEVANZ_TRACKER_URL.'?cid=' . $userid.'&t=d&';
+        if (isset($_SESSION['customer_id']) && ((int)$_SESSION['customer_id'] > 0)) {
+            $urlBase .= 'custid='.((int)$_SESSION['customer_id']).'&';
+        }
         $currentPage = strtolower($this->get_page());
         switch ($currentPage) {
             case 'cat': { // category
@@ -68,18 +75,15 @@ class RelevanzApplicationBottomExtender extends RelevanzApplicationBottomExtende
             }
         }
 
-        if (empty($urlJs)) {
-            return;
+        if (!empty($urlJs)) {
+            $this->v_output_buffer[] =
+                '<!-- Start of releva.nz tracking code -->'."\n"
+                .(new CookieConsentHelper())->getScriptTag($urlJs)."\n"
+                .'<!-- End of releva.nz tracking code -->';
+
         }
 
-        if (!is_array($this->v_output_buffer)) {
-            $this->v_output_buffer = [];
-        }
-
-        $this->v_output_buffer[] =
-             '<!-- Start of releva.nz tracking code -->'."\n"
-            .(new CookieConsentHelper())->getScriptTag($urlJs)."\n"
-            .'<!-- End of releva.nz tracking code -->';
+        parent::proceed();
     }
 
 }
