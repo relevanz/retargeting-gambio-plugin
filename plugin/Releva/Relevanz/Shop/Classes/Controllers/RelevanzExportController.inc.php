@@ -20,6 +20,46 @@ class RelevanzExportController extends AbstractRelevanzHttpViewController
 {
     const ITEMS_PER_PAGE = 2500;
 
+    protected $langId;
+
+    protected $taxes = [];
+
+    protected $cache = [];
+
+    protected function cachePopulate($cacheName, $queryBuilder) {
+        if (!isset($this->cache[$cacheName])) {
+            $this->cache[$cacheName] = [];
+        }
+        foreach ($queryBuilder->get()->result_array() as $row) {
+            $this->cache[$cacheName][$row['k']] = $row['v'];
+        }
+    }
+
+     protected function cacheKeyExists($cacheName, $key = false) {
+        return $key === false
+            ? isset($this->cache[$cacheName])
+            : isset($this->cache[$cacheName][$key]);
+    }
+
+    protected function cacheGetValue($cacheName, $key, $default = false) {
+        return $this->cacheKeyExists($cacheName, $key)
+            ? $this->cache[$cacheName][$key]
+            : $default;
+    }
+
+    protected function getVpeUnitById($id) {
+        if (!$this->cacheKeyExists('BasePriceUnit')) {
+            $this->cachePopulate(
+                'BasePriceUnit',
+                $this->db
+                    ->select('products_vpe_id as `k`, products_vpe_name as `v`')
+                    ->from(TABLE_PRODUCTS_VPE)
+                    ->where('language_id', $this->langId)
+            );
+        }
+        return $this->cacheGetValue('BasePriceUnit', $id, '');
+    }
+
     protected function getProductCount() {
         $r = $this->db->select('count(*)', false)
             ->from(TABLE_PRODUCTS)
@@ -38,15 +78,14 @@ class RelevanzExportController extends AbstractRelevanzHttpViewController
                 pd.products_short_description as `shortDescription`,
                 pd.products_description as `longDescription`,
                 pr.products_price as `price`, sp.specials_new_products_price as specials_price,
-                tr.tax_rate as taxRate,
+                pr.products_tax_class_id,
+                pr.products_vpe as products_vpe_unit, pr.products_vpe_value, pr.products_vpe_status,
                 pr.products_image as `image`
             ')
             ->from(TABLE_PRODUCTS.' AS pr')
             ->join(TABLE_PRODUCTS_DESCRIPTION.' AS pd', 'pr.products_id = pd.products_id', 'left')
-            ->join(TABLE_TAX_RATES.' AS tr', 'pr.products_tax_class_id = tr.tax_class_id', 'left')
-            ->join(TABLE_LANGUAGES.' AS ln', 'pd.language_id = ln.languages_id', 'left')
             ->join(TABLE_SPECIALS.' AS sp', ' pr.products_id = sp.products_id AND sp.status = "1"', 'left')
-            ->where('ln.code', $lang)
+            ->where('pd.language_id', $this->langId)
             ->where('pr.products_status', '1')
             ->group_by('pr.products_id')
             ->order_by('pr.products_id');
@@ -70,12 +109,47 @@ class RelevanzExportController extends AbstractRelevanzHttpViewController
     }
 
     protected function productImageUrl($image) {
+        if (empty($image)) {
+            return '';
+        }
         $imageUrl = HTTP_SERVER . DIR_WS_CATALOG . DIR_WS_INFO_IMAGES . $image;
 
         if (file_exists(DIR_WS_ORIGINAL_IMAGES . $image)) {
             $imageUrl = HTTP_SERVER . DIR_WS_CATALOG . DIR_WS_ORIGINAL_IMAGES . $image;
         }
         return $imageUrl;
+    }
+
+    protected function loadTaxes() {
+        $zoneIds = $this->db
+            ->select('geo_zone_id')
+            ->from(TABLE_GEO_ZONES)
+            ->order_by('geo_zone_name="Deutschland"', 'DESC', false)
+            ->order_by('geo_zone_name="Germany"', 'DESC', false)
+            ->order_by('geo_zone_name="Steuerzone EU"', 'DESC', false)
+            ->order_by('geo_zone_name="Österreich"', 'DESC', false)
+            ->order_by('geo_zone_name="Austria"', 'DESC', false)
+            ->order_by('geo_zone_id', 'ASC')
+            ->limit(5)
+            ->get()
+            ->result_array();
+
+        $taxQb = $this->db
+            ->select('tax_class_id, tax_rate')
+            ->from(TABLE_TAX_RATES);
+        foreach ($zoneIds as $row) {
+            $taxQb->order_by(sprintf('tax_zone_id = %d', $row['geo_zone_id']), 'DESC', false);
+        }
+        $taxQb
+            ->order_by('tax_priority')
+            ->order_by('tax_rate', 'DESC');
+
+        foreach ($taxQb->get()->result_array() as $row) {
+            if (isset($this->taxes[(int)$row['tax_class_id']])) {
+                continue;
+            }
+            $this->taxes[(int)$row['tax_class_id']] = (float)$row['tax_rate'];
+        }
     }
 
     public function actionDefault() {
@@ -86,7 +160,7 @@ class RelevanzExportController extends AbstractRelevanzHttpViewController
             ]);
         }
 
-        $lang = MainFactory::create('LanguageProvider', $this->db)->getDefaultLanguageCode();
+        $this->langId = MainFactory::create('LanguageProvider', $this->db)->getDefaultLanguageId();
 
         $exporter = null;
         switch ($this->_getQueryParameter('format')) {
@@ -99,6 +173,7 @@ class RelevanzExportController extends AbstractRelevanzHttpViewController
                 break;
             }
         }
+
         $pq = $this->getProductQuery($lang);
 
         if (($page = (int)$this->_getQueryParameter('page')) > 0) {
@@ -113,25 +188,38 @@ class RelevanzExportController extends AbstractRelevanzHttpViewController
             ]);
         }
 
+        $this->loadTaxes();
+
         foreach ($result as $product) {
-            $price = round($product['price'] + $product['price'] / 100 * $product['taxRate'], 2);
+            $tax = isset($this->taxes[$product['products_tax_class_id']])
+                ? $this->taxes[$product['products_tax_class_id']]
+                : 0.0;
+            $price = $product['price'] + $product['price'] / 100 * $tax;
             $priceOffer = ($product['specials_price'] === null)
                 ? $price
-                : round($product['specials_price'] + $product['specials_price'] / 100 * $product['taxRate'], 2);
+                : $product['specials_price'] + $product['specias_price'] / 100 * $tax;
 
-            $exporter->addItem(new ProductExportItem(
-                (int)$product['id'],
-                $this->getCategoryIdsByProductId($product['id']),
-                $product['name'],
-                $product['shortDescription'],
-                preg_replace('/\[TAB:([^\]]*)\]/', '<h1>${1}</h1>', $product['longDescription']),
-                $price,
-                $priceOffer,
-                HTTP_SERVER . DIR_WS_CATALOG . 'product_info.php?info=p' . xtc_get_prid($product['id']),
-                $this->productImageUrl($product['image'])
-            ));
+            $item = new ProductExportItem();
+            $item
+                ->setId((int)$product['id'])
+                ->setCategoryIds($this->getCategoryIdsByProductId($product['id']))
+                ->setName($product['name'])
+                ->setDescriptionShort($product['shortDescription'])
+                ->setDescriptionLong(preg_replace('/\[TAB:([^\]]*)\]/', '<h1>${1}</h1>', $product['longDescription']))
+                ->setPrice($product['price'], null, $tax)
+                ->setPriceOffer($product['specials_price'], null, $tax)
+                ->setLink(HTTP_SERVER . DIR_WS_CATALOG . 'product_info.php?info=p' . xtc_get_prid($product['id']))
+                ->setImage($this->productImageUrl($product['image']))
+            ;
+
+            if ((bool)$product['products_vpe_status']) {
+                $product['products_vpe_unit'] = $this->getVpeUnitById($product['products_vpe_unit']);
+                if (!empty($product['products_vpe_unit']) && ((float)$product['products_vpe_value'] > 0)) {
+                    $item->setBasePrice($product['products_vpe_unit'], (float)$product['products_vpe_value']);
+                }
+            }
+            $exporter->addItem($item);
         }
-
 
         $headers = [];
         foreach ($exporter->getHttpHeaders() as $hkey => $hval) {

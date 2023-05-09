@@ -36,8 +36,6 @@ class ProductCsvExporter extends AbstractCsvExporter
         }
         $row = $product->getData();
         $row['categoryIds'] = implode(',', $row['categoryIds']);
-        $row['price'] = round($row['price'], 2);
-        $row['priceOffer'] = round($row['priceOffer'], 2);
         return $row;
     }
 

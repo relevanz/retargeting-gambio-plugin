@@ -186,6 +186,8 @@ class ClassLoader
  *
  * Prevents access to $this/self from included files.
  */
-function relevanzTrackingIncludeFile($file) {
-    include $file;
+if (!function_exists('relevanzTrackingIncludeFile')) {
+    function relevanzTrackingIncludeFile($file) {
+        include $file;
+    }
 }
